@@ -8,33 +8,42 @@ from PIL import ImageFont
 from PIL import ImageDraw
 import shutil
 
-#summClient = 0
-#fileReadytoDelte = 0 
-
-def send_wallpaper(adres):
+def send_wallpaper():
     while True:
+
         create_wallpaper()
         lis = os.listdir('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo')
+        fileReadyToDelete = 0 
         if not lis:
             print ('файл не найден, ждем')
         else:
-            sock = socket.socket()         
-            port = 9090                
-            sock.connect((adres, port))
-            file = open('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo\\send.jpg','rb')
-            print ('Start Sending...')
-            l = file.read(1024)
+            exec(open("C:\\WallpaperManager\\WallpaperManagerServer\\wallpapermanagerconfig.conf").read())
+            for addres in addres_client:
+                try:
+                    sock = socket.socket()         
+                    port = 9090                
+                    sock.connect((addres, port))
+                    file = open('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo\\send.jpg','rb')
+                    print ('Start Sending...')
+                    l = file.read(1024)
 
-            while (l):
-                #print ('Sending...')
-                sock.send(l)
-                l = file.read(1024)
+                    while (l):
+                        #print ('Sending...')
+                        sock.send(l)
+                        l = file.read(1024)
 
-            file.close()
-            print ("Done Sending")
-            sock.shutdown(socket.SHUT_WR)                   
-            sock.close                   
-            os.remove('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo\\send.jpg')
+                    file.close()
+                    print ("Done Sending")
+                    sock.shutdown(socket.SHUT_WR)                   
+                    sock.close
+                    fileReadyToDelete += 1                
+                except Exception:
+                    print('Соединения с клиентом ' + addres + ' не установлено')
+                    fileReadyToDelete += 1 
+                
+                if fileReadyToDelete == len(addres_client):
+                    os.remove('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo\\send.jpg')
+
         time.sleep(4)
         
 
@@ -64,7 +73,6 @@ def create_wallpaper():
         img = Image.open('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo\\send.jpg') #добавление текста
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype("16658.otf", 52)
-        #month_now = (time_now.strftime("%#m"))
         int_month = int(time_now.strftime("%m"))
         draw.text((text_x, text_y), celebration[int_month], (255,0,255),font=font)
         img.save('C:\\WallpaperManager\\WallpaperManagerServer\\s_photo\\send.jpg')
@@ -74,7 +82,7 @@ def create_wallpaper():
 
 def copy_image(): # Копирование файлов из пользовательской папки в системную
     while True:
-        exec(open("wallpapermanagerconfig.conf").read())
+        exec(open("C:\\WallpaperManager\\WallpaperManagerServer\\wallpapermanagerconfig.conf").read())
         newpath = path_photo_user 
         if not os.path.exists(newpath): #создаем каталог, если его нет
             os.makedirs(newpath)
@@ -87,12 +95,7 @@ def copy_image(): # Копирование файлов из пользоват�
         time.sleep(4)
 
 
-exec(open("C:\WallpaperManager\WallpaperManagerServer\wallpapermanagerconfig.conf").read())
+exec(open("C:\\WallpaperManager\\WallpaperManagerServer\\wallpapermanagerconfig.conf").read())
 
-for client_list in addres_client:
-    summClient += 1
-    print (addres_client[client_list])
-    print (summClient)
-    #threading.Thread(target=send_wallpaper).start(addres_client[client_list])
-
-#threading.Thread(target=copy_image).start()
+threading.Thread(target=send_wallpaper).start()
+threading.Thread(target=copy_image).start()
