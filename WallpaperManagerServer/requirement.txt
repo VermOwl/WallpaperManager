@@ -1,0 +1,15 @@
+
+python 3.7+
+
+import socket 
+import os 
+import time
+import threading
+import datetime
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+import shutil
+import ctypes
+
+настройку можно проводить через конфигурационный файл
