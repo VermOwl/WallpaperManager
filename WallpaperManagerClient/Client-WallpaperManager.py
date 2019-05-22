@@ -11,7 +11,7 @@ def file_manager():
         while True:
             sock = socket.socket()      
             port = 9090              
-            sock.bind(('localhost', port))        
+            sock.bind(('', port))        
             file = open('C:\\WallpaperManager\\WallpaperManagerClient\\image\\add.jpg','wb')
             sock.listen(1)
             connect, addr = sock.accept()     

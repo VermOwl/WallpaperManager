@@ -37,7 +37,8 @@ def send_wallpaper():
                     sock.shutdown(socket.SHUT_WR)                   
                     sock.close
                     fileReadyToDelete += 1                
-                except Exception:
+                except Exception as e:
+                    print (e)
                     print('Соединения с клиентом ' + addres + ' не установлено')
                     fileReadyToDelete += 1 
                 
